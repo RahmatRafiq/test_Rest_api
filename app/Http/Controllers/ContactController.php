@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 
 class ContactController extends Controller
@@ -59,16 +61,23 @@ class ContactController extends Controller
      */
     public function update(Request $request, Contact $contact)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:contacts,email,'.$contact->id,
-            'phone_number' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:contacts,email,{$contact -> $id} ,id',
+            'phone_number' => 'required|max:255',
             'address' => 'required|string',
         ]);
-
+     
+        // dd($validator->messages());
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+       
         $contact->update($request->all());
 
         return response()->json($contact);
+
+        
     }
 
     /**

@@ -3,26 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
 
 class ContactController extends Controller
 {
     /**
-     * Menampilkan daftar resource.
+     * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
         $contacts = Contact::all();
-        return response()->json($contacts);
+        return view('contacts.index', compact('contacts'));
     }
 
     /**
-     * Menyimpan resource yang baru dibuat ke dalam penyimpanan.
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('contacts.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -38,58 +46,71 @@ class ContactController extends Controller
 
         $contact = Contact::create($request->all());
 
-        return response()->json($contact, 201);
+        return redirect()->route('contacts.index')->with('success', 'Contact created successfully.');
     }
 
     /**
-     * Menampilkan resource tertentu.
+     * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Contact $contact)
+    public function show($id)
     {
-        return response()->json($contact);
+        $contact = Contact::findOrFail($id);
+        return view('contacts.show', compact('contact'));
     }
 
     /**
-     * Memperbarui resource yang ditentukan.
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $contact = Contact::findOrFail($id);
+        return view('contacts.edit', compact('contact'));
+    }
+
+    /**
+     * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Contact $contact)
+    public function update(Request $request, $id)
     {
+        $contact = Contact::findOrFail($id);
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:contacts,email,{$contact -> $id} ,id',
-            'phone_number' => 'required|max:255',
+            'email' => 'required|string|email|max:255|unique:contacts,email,' . $contact->id,
+            'phone_number' => 'required|string|max:255',
             'address' => 'required|string',
         ]);
-     
-        // dd($validator->messages());
+
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return redirect()->route('contacts.edit', $id)->withErrors($validator)->withInput();
         }
-       
+
         $contact->update($request->all());
 
-        return response()->json($contact);
-
-        
+        return redirect()->route('contacts.index')->with('success', 'Contact updated successfully.');
     }
 
     /**
-     * Menghapus resource yang ditentukan.
+     * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Contact $contact)
+    public function destroy($id)
     {
+        $contact = Contact::findOrFail($id);
         $contact->delete();
 
-        return response()->json(null, 204);
+        return redirect()->route('contacts.index')->with('success', 'Contact deleted successfully.');
     }
 }

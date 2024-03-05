@@ -54,7 +54,7 @@ Here are the general steps to install and run an existing Laravel project from G
 Make sure you have PHP, Composer, and MySQL installed on your computer before running the above steps. If there are any errors or issues during the installation process, be sure to read the error messages displayed in the terminal to understand the cause.
 ## HOW TO TEST API
 4. for Postman API documentation
-import exported file from API Documentation ```laravel/laravel_test_api.json```
+import exported file from API Documentation ```Simple_Rest_Api.postman_collection.json```
 
 
 # ISSUES AND SUGGESTIONS

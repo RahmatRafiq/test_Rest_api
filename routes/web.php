@@ -18,4 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('contacts', ContactController::class);
+Route::resource('/', ContactController::class);
+// Route::get('/search', [ContactController::class, 'search']);
+Route::get('/search', [ContactController::class, 'search'])->name('search');

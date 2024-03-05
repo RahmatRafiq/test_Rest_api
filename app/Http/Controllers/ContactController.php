@@ -19,6 +19,8 @@ class ContactController extends Controller
         return view('contacts.index', compact('contacts'));
     }
 
+    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -26,8 +28,21 @@ class ContactController extends Controller
      */
     public function create()
     {
-        return view('contacts.create');
+        return view('create');
     }
+
+    public function search(Request $request)
+{
+    $query = $request->input('query');
+    $contacts = Contact::where('name', 'LIKE', "%$query%")
+        ->orWhere('email', 'LIKE', "%$query%")
+        ->orWhere('phone_number', 'LIKE', "%$query%")
+        ->orWhere('address', 'LIKE', "%$query%")
+        ->get();
+
+    return view('contacts.index', compact('contacts'));
+}
+
 
     /**
      * Store a newly created resource in storage.
@@ -46,7 +61,7 @@ class ContactController extends Controller
 
         $contact = Contact::create($request->all());
 
-        return redirect()->route('contacts.index')->with('success', 'Contact created successfully.');
+        return redirect()->route('index')->with('success', 'Contact created successfully.');
     }
 
     /**
@@ -92,12 +107,12 @@ class ContactController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('contacts.edit', $id)->withErrors($validator)->withInput();
+            return redirect()->route('edit', $id)->withErrors($validator)->withInput();
         }
 
         $contact->update($request->all());
 
-        return redirect()->route('contacts.index')->with('success', 'Contact updated successfully.');
+        return redirect()->route('index')->with('success', 'Contact updated successfully.');
     }
 
     /**

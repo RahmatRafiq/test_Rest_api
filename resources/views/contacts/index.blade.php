@@ -10,7 +10,11 @@
 <body>
     <div class="container">
         <h1 class="text-center my-5">Contacts</h1>
-        <a href="{{ route('contacts.create') }}" class="btn btn-primary btn-add">Add Contact <i class="fas fa-plus"></i></a>
+        <a href="{{ route('create') }}" class="btn btn-primary btn-add">Add Contact <i class="fas fa-plus"></i></a>
+        <form id="searchForm" action="{{ route('search') }}" method="GET">
+            <input type="text" name="query" id="query" placeholder="Cari kontak...">
+            <button type="submit" class="btn btn-primary">Cari</button>
+        </form>
         <table class="table">
             <thead>
                 <tr>
@@ -29,19 +33,17 @@
                         <td>{{ $contact->phone_number }}</td>
                         <td>{{ $contact->address }}</td>
                         <td>
-                            <a href="{{ route('contacts.show', $contact->id) }}" class="btn btn-info btn-icon">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ route('contacts.edit', $contact->id) }}" class="btn btn-primary btn-icon">
+                            <a href="{{ route('edit', $contact->id) }}" class="btn btn-primary btn-icon">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('contacts.destroy', $contact->id) }}" method="POST" style="display: inline-block;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-icon">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
+                                <form action="{{ route('destroy', $contact->id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Anda yakin ingin menghapus data {{ $contact->name }}?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-icon">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+
                         </td>
                     </tr>
                 @endforeach
@@ -50,3 +52,20 @@
     </div>
 </body>
 </html>
+<script>
+    $(document).ready(function () {
+        $('#searchForm').on('submit', function (e) {
+            e.preventDefault();
+            var query = $('#query').val();
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('search') }}',
+                data: {query: query},
+                success: function (data) {
+                    $('#contactsTable tbody').html(data);
+                }
+            });
+        });
+    });
+</script>
+

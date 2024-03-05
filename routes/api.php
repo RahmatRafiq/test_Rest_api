@@ -21,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::apiResource('contacts', \App\Http\Controllers\API\ContactController::class);
+Route::get('search', [\App\Http\Controllers\API\ContactController::class, 'search']);

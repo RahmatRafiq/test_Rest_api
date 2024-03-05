@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Validator;
 class ContactController extends Controller
 {
     /**
-     * Menampilkan daftar resource.
-     *
      * @return \Illuminate\Http\Response
      */
     public function index()
@@ -20,9 +18,22 @@ class ContactController extends Controller
         return response()->json($contacts);
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $contacts = Contact::where('name', 'LIKE', "%$query%")
+            ->orWhere('email', 'LIKE', "%$query%")
+            ->orWhere('phone_number', 'LIKE', "%$query%")
+            ->orWhere('address', 'LIKE', "%$query%")
+            ->get();
+
+            
+
+        return response()->json($contacts);
+    }
+
+
     /**
-     * Menyimpan resource yang baru dibuat ke dalam penyimpanan.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
@@ -34,15 +45,12 @@ class ContactController extends Controller
             'phone_number' => 'required|string|max:255',
             'address' => 'required|string',
         ]);
-// dd($request->all());
         $contact = Contact::create($request->all());
 
         return response()->json($contact, 201);
     }
 
     /**
-     * Menampilkan resource tertentu.
-     *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -52,8 +60,6 @@ class ContactController extends Controller
     }
 
     /**
-     * Memperbarui resource yang ditentukan.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -67,7 +73,6 @@ class ContactController extends Controller
             'address' => 'required|string',
         ]);
      
-        // dd($validator->messages());
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
